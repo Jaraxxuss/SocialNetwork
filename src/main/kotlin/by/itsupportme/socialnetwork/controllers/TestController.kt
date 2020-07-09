@@ -16,9 +16,9 @@ class TestController(
     @GetMapping
     fun test() : MutableIterable<User> {
         ur.save(User(email = "qwe"))
-        ur.save(User(email = "Kotlin Sosatb"))
-        ur.save(User(email = "Java sosatb"))
-        ur.save(User(email = "PHP Baldioj"))
+        ur.save(User(email = "asd"))
+        ur.save(User(email = "zxc"))
+        ur.save(User(email = "rty"))
         return ur.findAll()
     }
 }
