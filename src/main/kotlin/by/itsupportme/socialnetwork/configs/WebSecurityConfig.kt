@@ -57,7 +57,7 @@ class WebSecurityConfig(
     @Throws(Exception::class)
     override fun configure(httpSecurity: HttpSecurity) {
         httpSecurity.csrf().disable()
-                .authorizeRequests().antMatchers("/authenticate", "/db/**").permitAll().anyRequest().authenticated().and().exceptionHandling()
+                .authorizeRequests().antMatchers("/registration", "/login",  "/db/**").permitAll().anyRequest().authenticated().and().exceptionHandling()
         .authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)

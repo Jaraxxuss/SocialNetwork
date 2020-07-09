@@ -28,11 +28,11 @@ class JwtRequestFilter(
 
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
-        val requestTokenHeader = request.getHeader("Authorization")
+        val requestTokenHeader = request.getHeader("token")
         var username: String? = null
         var jwtToken: String? = null
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7)
+        if (requestTokenHeader != null) {
+            jwtToken = requestTokenHeader
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken)
             } catch (e: IllegalArgumentException) {
@@ -40,8 +40,6 @@ class JwtRequestFilter(
             } catch (e: ExpiredJwtException) {
                 println("JWT Token has expired")
             }
-        } else {
-            logger.warn("JWT Token does not begin with Bearer String")
         }
         if (username != null && SecurityContextHolder.getContext().authentication == null) {
             val userDetails: UserDetails = jwtUserDetailsService.loadUserByUsername(username)!!
