@@ -15,5 +15,7 @@ class User (
         var friends : Set<User> = setOf(),
         @OneToMany
         var album : Set<Image> = setOf(),
-        var email : String? = null
+        var email : String? = null,
+        @OneToMany
+        var chats : Set<Message> = setOf()
 ) : AvatarIdentity()
