@@ -1,39 +1,34 @@
 package by.itsupportme.socialnetwork.services
 
-import by.itsupportme.socialnetwork.beans.jwt.JwtRequest
-import by.itsupportme.socialnetwork.repositories.JwtRequestRepository
+import by.itsupportme.socialnetwork.beans.User
 import by.itsupportme.socialnetwork.repositories.UserRepo
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
-
+import java.util.*
 
 @Service
 class JwtUserDetailsService(
         @Autowired
-        private val repo: JwtRequestRepository,
+        private val repo: UserRepo,
         @Autowired
-        private val userRepo: UserRepo
+        private val userRepository: UserRepo
 ) : UserDetailsService {
 
     @Throws(UsernameNotFoundException::class)
-    override fun loadUserByUsername(s: String): JwtRequest? {
-
-        return repo.getByUser_Name(s)
+    override fun loadUserByUsername(name: String): UserDetails {
+        val user = userRepository.findByName(name) ?: throw UsernameNotFoundException("User not found with username: $name")
+        return org.springframework.security.core.userdetails.User(user.name, user.password, ArrayList<GrantedAuthority>())
     }
 
-    fun save(r: JwtRequest): JwtRequest? {
-
-        userRepo.save(r.user)
-        return repo.save(r)
+    fun save(user: User): User {
+        return userRepository.save(user)
     }
 
-    fun delete(name: String) {
-
-        repo.delete(loadUserByUsername(name)!!)
+    fun allUsers(): MutableIterable<User?>{
+        return repo.findAll()
     }
-
-    val allUsers: MutableIterable<JwtRequest?>
-        get() = repo.findAll()
 }

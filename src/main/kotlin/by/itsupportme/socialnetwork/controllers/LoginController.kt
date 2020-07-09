@@ -28,12 +28,8 @@ class LoginController(
 ) {
     @PostMapping(value = ["/login"])
     fun createAuthenticationToken(@RequestBody authenticationRequest: JwtRequest): ResponseEntity<*> {
-        try {
-            authenticate(authenticationRequest.username, authenticationRequest.password)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        val userDetails: UserDetails = userDetailService.loadUserByUsername(authenticationRequest.username)!!
+        authenticate(authenticationRequest.name, authenticationRequest.password)
+        val userDetails: UserDetails = userDetailService.loadUserByUsername(authenticationRequest.name)
         val token: String = jwtTokenUtil.generateToken(userDetails)!!
         return ResponseEntity.ok<Any>(JwtResponse(token))
     }
