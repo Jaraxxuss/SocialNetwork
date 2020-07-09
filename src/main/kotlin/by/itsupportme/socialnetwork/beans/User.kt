@@ -1,6 +1,7 @@
 package by.itsupportme.socialnetwork.beans
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import org.springframework.security.core.userdetails.UserDetails
 import java.time.LocalDate
 import javax.persistence.Entity
 import javax.persistence.OneToMany
@@ -14,6 +15,5 @@ class User (
         var friends : Set<User> = setOf(),
         @OneToMany
         var album : Set<Image> = setOf(),
-        var email : String
-
+        var email : String? = null
 ) : AvatarIdentity()

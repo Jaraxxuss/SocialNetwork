@@ -18,7 +18,7 @@ class TestController(
         ur.save(User(email = "qwe"))
         ur.save(User(email = "asd"))
         ur.save(User(email = "zxc"))
-        ur.save(User(email = "rty"))
+        ur.save(User(email = "dfg"))
         return ur.findAll()
     }
 }
