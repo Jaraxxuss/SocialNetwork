@@ -5,6 +5,8 @@ import by.itsupportme.socialnetwork.beans.jwt.JwtResponse
 import by.itsupportme.socialnetwork.services.JwtUserDetailsService
 import by.itsupportme.socialnetwork.utils.JwtTokenUtil
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
@@ -26,15 +28,20 @@ class LoginController(
         @Autowired
         var userDetailService: JwtUserDetailsService
 ) {
-    @PostMapping(value = ["/login"])
+
+    @Value("\${message.wrongCredentials}")
+    lateinit var errorMessage: String
+
+    @PostMapping( "\${mapping.login}")
     fun createAuthenticationToken(@RequestBody authenticationRequest: JwtRequest): ResponseEntity<*> {
         try {
-            authenticate(authenticationRequest.username, authenticationRequest.password)
-        } catch (e: Exception) {
-            e.printStackTrace()
+            authenticate(authenticationRequest.user.name!!, authenticationRequest.password)
+        } catch (e : Exception){
+            return ResponseEntity(errorMessage, HttpStatus.BAD_REQUEST)
         }
-        val userDetails: UserDetails = userDetailService.loadUserByUsername(authenticationRequest.username)!!
-        val token: String = jwtTokenUtil.generateToken(userDetails)!!
+
+        val token: String = jwtTokenUtil.generateToken(userDetailService.loadUserByUsername(authenticationRequest.user.name!!)!!)!!
+
         return ResponseEntity.ok<Any>(JwtResponse(token))
     }
 
@@ -45,8 +52,7 @@ class LoginController(
         } catch (e: DisabledException) {
 //            throw Exception("USER_DISABLED", e)
         } catch (e: BadCredentialsException) {
-//            throw Exception("INVALID_CREDENTIALS", e)
+            throw Exception("INVALID_CREDENTIALS", e)
         }
     }
-
 }

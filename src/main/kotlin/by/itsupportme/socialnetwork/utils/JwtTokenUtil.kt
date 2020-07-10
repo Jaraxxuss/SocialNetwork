@@ -1,8 +1,11 @@
 package by.itsupportme.socialnetwork.utils
 
+import by.itsupportme.socialnetwork.beans.jwt.JwtRequest
+import by.itsupportme.socialnetwork.services.JwtUserDetailsService
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cglib.core.internal.Function
 import org.springframework.security.core.userdetails.UserDetails
@@ -11,7 +14,10 @@ import java.util.*
 import kotlin.collections.HashMap
 
 @Component
-class JwtTokenUtil {
+class JwtTokenUtil(
+        @Autowired
+        val jwtUserDetailsService: JwtUserDetailsService
+) {
 
     @Value("\${jwt.secret}")
     lateinit var secret : String
@@ -47,9 +53,16 @@ class JwtTokenUtil {
     }
 
     //  generate token for user
-    fun generateToken(ud: UserDetails): String? {
+    fun generateToken(ud: JwtRequest): String? {
         val claims: Map<String, Any> = HashMap()
-        return doGenerateToken(claims, ud.username)
+
+        val token = doGenerateToken(claims, ud.username)
+
+        ud.token = token
+
+        jwtUserDetailsService.save(ud)
+
+        return token
     }
 
     /*
@@ -68,6 +81,16 @@ class JwtTokenUtil {
     //  Token validation
     fun validateToken(token: String, ud: UserDetails): Boolean? {
         val username = getUsernameFromToken(token)
-        return username == ud.username && !isTokenExpired(token)
+
+        val jwtRequest = jwtUserDetailsService.loadUserByUsername(username)
+
+        print("\n\n\n\nHERE IS CHECK\n${username}\n${token}\n${jwtRequest.toString()}\n")
+
+        return username == ud.username && !isTokenExpired(token) && jwtUserDetailsService.getJwtRequestByNameAndToken(username,token) != null
+    }
+
+    fun invalidateToken(jwtRequest: JwtRequest){
+
+        jwtUserDetailsService.loadUserByUsername(jwtRequest.username)!!.token = null
     }
 }

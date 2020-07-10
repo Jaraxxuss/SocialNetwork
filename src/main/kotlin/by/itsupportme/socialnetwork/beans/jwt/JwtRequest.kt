@@ -12,7 +12,8 @@ import javax.persistence.OneToOne
 @Entity
 class JwtRequest(
         @OneToOne
-        var user: User = User()
+        var user: User = User(),
+        var token: String? = null
 
 ) : Serializable, UserDetails, Identity(){
     companion object {
@@ -59,4 +60,10 @@ class JwtRequest(
     override fun isAccountNonLocked(): Boolean {
         return true
     }
+
+    override fun toString(): String {
+        return "JwtRequest(user=$user, token=$token)"
+    }
+
+
 }
