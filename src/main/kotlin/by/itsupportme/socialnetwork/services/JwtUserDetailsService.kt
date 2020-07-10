@@ -19,8 +19,8 @@ class JwtUserDetailsService(
 ) : UserDetailsService {
 
     @Throws(UsernameNotFoundException::class)
-    override fun loadUserByUsername(name: String): UserDetails {
-        val user = userRepository.findByName(name) ?: throw UsernameNotFoundException("User not found with username: $name")
+    override fun loadUserByUsername(name: String): UserDetails? {
+        val user = userRepository.findByName(name) ?: return null
         return org.springframework.security.core.userdetails.User(user.name, user.password, ArrayList<GrantedAuthority>())
     }
 
