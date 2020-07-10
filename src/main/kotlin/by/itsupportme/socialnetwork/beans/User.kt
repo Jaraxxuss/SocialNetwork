@@ -18,4 +18,10 @@ class User (
         var email : String? = null,
         @OneToMany
         var chats : Set<Chat> = setOf()
-) : AvatarIdentity()
+
+
+) : AvatarIdentity() {
+        override fun toString(): String {
+                return "User(password=$password, bday=$bday, email=$email)"
+        }
+}

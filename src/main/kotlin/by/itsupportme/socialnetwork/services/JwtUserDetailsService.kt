@@ -34,6 +34,15 @@ class JwtUserDetailsService(
         repo.delete(loadUserByUsername(name)!!)
     }
 
+    fun getJwtRequestByNameAndToken(name: String, token: String) : JwtRequest? {
+
+        return repo.getByUser_NameAndToken(name,token)
+    }
+
+    fun updateJwtRequest(jwtRequest: JwtRequest){
+//        repo.
+    }
+
     val allUsers: MutableIterable<JwtRequest?>
         get() = repo.findAll()
 }
