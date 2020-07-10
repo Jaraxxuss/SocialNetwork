@@ -20,6 +20,8 @@ class JwtRequest(
         val serialVersionUid = 5926468583005150707L;
     }
 
+    constructor(name: String) : this(name, "")
+
     constructor(name : String, password: String) : this(){
         this.password = password
         this.username = name

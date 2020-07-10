@@ -4,6 +4,7 @@ import by.itsupportme.socialnetwork.beans.jwt.JwtRequest
 import by.itsupportme.socialnetwork.beans.jwt.JwtResponse
 import by.itsupportme.socialnetwork.services.JwtUserDetailsService
 import by.itsupportme.socialnetwork.utils.JwtTokenUtil
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
@@ -17,8 +18,9 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RestController
 
-@Controller
+@RestController
 @CrossOrigin
 class LoginController(
         @Autowired
@@ -28,6 +30,8 @@ class LoginController(
         @Autowired
         var userDetailService: JwtUserDetailsService
 ) {
+
+    val logger = LoggerFactory.getLogger(LoginController::class.java)!!
 
     @Value("\${message.wrongCredentials}")
     lateinit var errorMessage: String
@@ -47,12 +51,15 @@ class LoginController(
 
     @Throws(Exception::class)
     private fun authenticate(username: String, password: String) {
+        logger.info("start of authentication of $username")
         try {
             authenticationManager.authenticate(UsernamePasswordAuthenticationToken(username, password))
         } catch (e: DisabledException) {
 //            throw Exception("USER_DISABLED", e)
         } catch (e: BadCredentialsException) {
+            logger.info("bad credentials from  $username")
             throw Exception("INVALID_CREDENTIALS", e)
         }
+        logger.info("successful authentication of $username")
     }
 }

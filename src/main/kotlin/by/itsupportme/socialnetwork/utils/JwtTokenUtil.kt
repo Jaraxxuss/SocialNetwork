@@ -23,39 +23,45 @@ class JwtTokenUtil(
     lateinit var secret : String
 
     companion object{
+
         const val serialVersionUID = -2550185165626007488L
         const val JWT_TOKEN_VALIDITY = 5 * 60 * 60.toLong()
     }
 
     fun <T> getClaimFromToken(token: String, claimsResolver : Function<Claims, T>): T {
+
         val claims: Claims = getAllClaimsFromToken(token)
         return claimsResolver.apply(claims)
     }
 
     private fun getAllClaimsFromToken(token: String): Claims {
+
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody()
     }
 
     //  retrieve username from JWT token
     fun getUsernameFromToken(token: String): String {
+
         return getClaimFromToken(token, Function(Claims::getSubject))
     }
 
     //  retrieve expiration date from token
     fun getExpirationDateFromToken(token: String): Date {
+
         return getClaimFromToken(token, Function(Claims::getExpiration))
     }
 
     //  check if token is expired
     fun isTokenExpired(token: String): Boolean {
+
         val expiration = getExpirationDateFromToken(token)
         return expiration.before(Date())
     }
 
     //  generate token for user
     fun generateToken(ud: JwtRequest): String? {
-        val claims: Map<String, Any> = HashMap()
 
+        val claims: Map<String, Any> = HashMap()
         val token = doGenerateToken(claims, ud.username)
 
         ud.token = token
@@ -73,6 +79,7 @@ class JwtTokenUtil(
     *   compaction of the JWT to a URL-safe string
     * */
     private fun doGenerateToken(claims: Map<String, Any>, subject: String): String? {
+
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(Date(System.currentTimeMillis()))
                 .setExpiration(Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret).compact()
@@ -80,17 +87,16 @@ class JwtTokenUtil(
 
     //  Token validation
     fun validateToken(token: String, ud: UserDetails): Boolean? {
+
         val username = getUsernameFromToken(token)
-
         val jwtRequest = jwtUserDetailsService.loadUserByUsername(username)
-
-        print("\n\n\n\nHERE IS CHECK\n${username}\n${token}\n${jwtRequest.toString()}\n")
 
         return username == ud.username && !isTokenExpired(token) && jwtUserDetailsService.getJwtRequestByNameAndToken(username,token) != null
     }
 
     fun invalidateToken(jwtRequest: JwtRequest){
 
-        jwtUserDetailsService.loadUserByUsername(jwtRequest.username)!!.token = null
+        jwtRequest.token = null
+        jwtUserDetailsService.save(jwtRequest)
     }
 }

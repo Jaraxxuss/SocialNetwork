@@ -33,14 +33,10 @@ class WebSecurityConfig(
         @Autowired
         private var jwtRequestFilter: JwtRequestFilter
 ) : WebSecurityConfigurerAdapter() {
-    //  eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuIiwiZXhwIjoxNTk0Mzk4MjIyLCJpYXQiOjE1OTQzODAyMjJ9.O_cRjzgl099bnXFd4us9D-E0xyyXhk-lByOKstw9naG6UQVuJuT9vfxlqnwc1ilBk5a_xHgCqKKignuCXh5HnA
-//  eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJuIiwiZXhwIjoxNTk0Mzk4MTk4LCJpYXQiOjE1OTQzODAxOTh9.hmSqn4fxRSUZ3QG3jMnkynndCKTflcUWdUPyUtkewyplocgNToefS2vVqFgsvSClo2Ogybt6pfaK9TNBTF7Syw
+
     @Autowired
     @Throws(Exception::class)
     fun configureGlobal(auth: AuthenticationManagerBuilder) {
-// configure AuthenticationManager so that it knows from where to load
-// user for matching credentials
-// Use BCryptPasswordEncoder
         auth.userDetailsService<UserDetailsService?>(jwtUserDetailsService).passwordEncoder(passwordEncoder())
     }
 
