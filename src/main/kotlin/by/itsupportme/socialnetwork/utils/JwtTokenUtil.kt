@@ -89,7 +89,6 @@ class JwtTokenUtil(
     fun validateToken(token: String, ud: UserDetails): Boolean? {
 
         val username = getUsernameFromToken(token)
-        val jwtRequest = jwtUserDetailsService.loadUserByUsername(username)
 
         return username == ud.username && !isTokenExpired(token) && jwtUserDetailsService.getJwtRequestByNameAndToken(username,token) != null
     }

@@ -13,10 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -31,16 +28,18 @@ class LogoutController (
     val logger = LoggerFactory.getLogger(LoginController::class.java)!!
 
     @PostMapping( "\${mapping.logout}")
-    fun logoutJwtUser(@RequestBody authenticationRequest: JwtRequest) : ResponseEntity<*>{
+    fun logoutJwtUser(@RequestHeader("token") token: String) : ResponseEntity<*>{
 
-        logger.info("trying to logout ${authenticationRequest.username}")
+        val username = jwtTokenUtil.getUsernameFromToken(token)
+
+        logger.info("trying to logout $username")
         try {
-            jwtTokenUtil.invalidateToken(userDetailService.loadUserByUsername(authenticationRequest.username)!!)
+            jwtTokenUtil.invalidateToken(userDetailService.loadUserByUsername(username)!!)
         } catch (e: NullPointerException){
-            logger.info("no user with such name : ${authenticationRequest.username}")
-            return ResponseEntity("could not found user with name ${authenticationRequest.username}", HttpStatus.BAD_REQUEST)
+            logger.info("no user with such name : $username")
+            return ResponseEntity("could not found user with name $username", HttpStatus.BAD_REQUEST)
         }
-        logger.info("successfully logout of ${authenticationRequest.username}")
-        return ResponseEntity("successful token invalidation of user with name ${authenticationRequest.username}", HttpStatus.OK)
+        logger.info("successfully logout of $username")
+        return ResponseEntity("successful token invalidation of user with name $username", HttpStatus.OK)
     }
 }
